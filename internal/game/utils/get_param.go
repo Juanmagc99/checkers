@@ -18,3 +18,15 @@ func GetGameID(c echo.Context) (string, error) {
 	}
 	return gameID, nil
 }
+
+func GetPlayerToken(c echo.Context) (string, error) {
+	playerToken := c.QueryParam("player_token")
+	if playerToken == "" {
+		return "", errors.New("player token not provided")
+	}
+
+	if _, err := uuid.Parse(playerToken); err != nil {
+		return "", errors.New("invalid player token format")
+	}
+	return playerToken, nil
+}

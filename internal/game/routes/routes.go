@@ -11,5 +11,7 @@ func RegisterRoutes(e *echo.Echo,
 
 	api := e.Group("/api")
 
-	api.GET("/games", gameHandler.CreateGame)
+	api.POST("/games", gameHandler.CreateGame)
+	api.POST("/games/:id/join", gameHandler.JoinGame)
+	api.GET("/games/:id", gameHandler.GetGame)
 }

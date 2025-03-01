@@ -22,7 +22,6 @@ func NewGameHandler(redisStore storage.RedisStore) *GameHandler {
 }
 
 func (h *GameHandler) CreateGame(c echo.Context) error {
-
 	gameID := uuid.New().String()
 	player1Token := uuid.New().String()
 
@@ -46,8 +45,7 @@ func (h *GameHandler) CreateGame(c echo.Context) error {
 	})
 }
 
-func (h *GameHandler) JoinGame(c echo.Context) err {
-
+func (h *GameHandler) JoinGame(c echo.Context) error {
 	gameID, err := utils.GetGameID(c)
 	if err != nil {
 		return utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -79,4 +77,31 @@ func (h *GameHandler) JoinGame(c echo.Context) err {
 		"game_id":       gameID,
 		"player2_token": player2Token,
 	})
+}
+
+func (h *GameHandler) GetGame(c echo.Context) error {
+	gameID, err := utils.GetGameID(c)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	ctx := c.Request().Context()
+
+	var game models.Game
+	if err := h.redisStore.Get(ctx, gameID, &game); err != nil {
+		return utils.ErrorResponse(c, http.StatusNotFound, "Game not found")
+	}
+
+	playerToken, err := utils.GetPlayerToken(c)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	err = game.ToSafeGame(playerToken)
+	if err != nil {
+		c.Logger().Error(err)
+		return utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized access")
+	}
+
+	return c.JSON(http.StatusOK, game)
 }

@@ -1,5 +1,7 @@
 package models
 
+import "errors"
+
 type GameStatus string
 
 const (
@@ -53,4 +55,17 @@ func (s GameStatus) IsValid() bool {
 	default:
 		return false
 	}
+}
+
+func (g *Game) ToSafeGame(requestToken string) error {
+
+	if requestToken == g.Player1Token {
+		g.Player2Token = ""
+	} else if requestToken == g.Player2Token {
+		g.Player1Token = ""
+	} else {
+		return errors.New("unauthorized access")
+	}
+
+	return nil
 }
