@@ -1,10 +1,20 @@
 package models
 
+type GameStatus string
+
+const (
+	StatusWaiting    GameStatus = "waiting"
+	StatusInProgress GameStatus = "in_progress"
+	StatusFinished   GameStatus = "finished"
+)
+
 type Game struct {
-	ID     string     `json:"id"`
-	Board  [][]string `json:"board"`
-	Turn   string     `json:"turn"`
-	Status string     `json:"status"`
+	ID           string     `json:"id"`
+	Board        [][]string `json:"board"`
+	Turn         string     `json:"turn"`
+	Status       GameStatus `json:"status"`
+	Player1Token string     `json:"player1_token,omitempty"`
+	Player2Token string     `json:"player2_token,omitempty"`
 }
 
 /*
@@ -34,4 +44,13 @@ func InitBoard() [][]string {
 	}
 
 	return board
+}
+
+func (s GameStatus) IsValid() bool {
+	switch s {
+	case StatusWaiting, StatusInProgress, StatusFinished:
+		return true
+	default:
+		return false
+	}
 }
