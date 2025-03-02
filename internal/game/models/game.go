@@ -57,15 +57,16 @@ func (s GameStatus) IsValid() bool {
 	}
 }
 
-func (g *Game) ToSafeGame(requestToken string) error {
+func (g *Game) ToSafeGame(requestToken string) (string, error) {
 
 	if requestToken == g.Player1Token {
 		g.Player2Token = ""
+		return "player1", nil
 	} else if requestToken == g.Player2Token {
 		g.Player1Token = ""
+		return "player2", nil
 	} else {
-		return errors.New("unauthorized access")
+		return "", errors.New("unauthorized access")
 	}
 
-	return nil
 }

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+</head>
+
+<body>
+    <h1>Prueba de WebSocket</h1>
+    <label for="gameId">Game ID:</label>
+    <input type="text" id="gameId" placeholder="Ingresa game ID">
+    <br><br>
+    <label for="playerToken">Player Token:</label>
+    <input type="text" id="playerToken" placeholder="Ingresa player token">
+    <br><br>
+    <button id="connectBtn">Conectar</button>
+    <hr>
+    <textarea id="messages" rows="10" cols="50" placeholder="Mensajes..." readonly></textarea>
+    <br>
+    <input type="text" id="messageInput" placeholder="Escribe un mensaje">
+    <button id="sendBtn">Enviar</button>
+
+    <script>
+        let ws;
+
+        // Conecta al WebSocket usando los parámetros ingresados
+        document.getElementById('connectBtn').addEventListener('click', () => {
+            const gameId = document.getElementById('gameId').value.trim();
+            const playerToken = document.getElementById('playerToken').value.trim();
+            if (!gameId || !playerToken) {
+                alert("Ingresa game ID y player token");
+                return;
+            }
+
+            // Asegúrate de que la URL sea correcta según tu configuración
+            const wsUrl = `ws://localhost:8080/api/games/${gameId}/ws?player_token=${playerToken}`;
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                logMessage("Conexión establecida.");
+            };
+
+            ws.onmessage = (event) => {
+                logMessage("Mensaje recibido: " + event.data);
+            };
+
+            ws.onerror = (error) => {
+                logMessage("Error: " + error);
+            };
+
+            ws.onclose = () => {
+                logMessage("Conexión cerrada.");
+            };
+        });
+
+        // Enviar mensaje
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const msg = document.getElementById('messageInput').value;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(msg);
+                logMessage("Mensaje enviado: " + msg);
+                document.getElementById('messageInput').value = "";
+            } else {
+                alert("Conexión WebSocket no establecida.");
+            }
+        });
+
+        // Función para agregar mensajes al área de texto
+        function logMessage(message) {
+            const messagesArea = document.getElementById('messages');
+            messagesArea.value += message + "\n";
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
