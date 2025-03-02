@@ -14,5 +14,4 @@ func RegisterRoutes(e *echo.Echo,
 	api.POST("/games", gameHandler.CreateGameHandler)
 	api.POST("/games/:id/join", gameHandler.JoinGameHandler)
 	api.GET("/games/:id", gameHandler.GetGameHandler)
-	api.GET("/games/:id/ws", gameHandler.GameSessionHandler)
 }
